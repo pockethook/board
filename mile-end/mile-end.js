@@ -1,3 +1,4 @@
+var jpeg = 'mile-end.jpg'
 var annotations = [
   {
     "id": 0,

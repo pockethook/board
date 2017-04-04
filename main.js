@@ -40,7 +40,7 @@ window.onload = function() {
 		canvas.height = image.height;
 		draw(canvas, context, image, annotations);
 	};
-	image.src = 'board.jpg';
+	image.src = jpeg;
 
 
 	download.onclick = function() {
