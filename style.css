@@ -1,3 +1,7 @@
+#download-link {
+	display: none;
+}
+
 #canvas {
 	width: 98vw;
 }
