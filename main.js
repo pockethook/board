@@ -98,11 +98,10 @@ function Boxes(boxes) {
 	}
 }
 
-window.onload = function() {
+$(document).ready(function() {
 	var boxes;
-	read_json(json, function(data) {
-		var annotations = JSON.parse(data);
-		boxes = new Boxes(annotations);
+	$.getJSON(centre + '-' + date + '.json', function(data) {
+		boxes = new Boxes(data);
 		try {
 			var indices = JSON.parse(window.location.hash.substring(1));
 			// ignores bad values
@@ -113,7 +112,7 @@ window.onload = function() {
 		window.history.replaceState(undefined, undefined, anchor(boxes));
 	});
 
-	var canvas = document.getElementById('canvas');
+	var canvas = $('#canvas')[0];
 	var context = canvas.getContext('2d');
 
 	var image = new Image();
@@ -122,10 +121,9 @@ window.onload = function() {
 		canvas.height = image.height;
 		draw(canvas, context, image, boxes);
 	};
-	image.src = jpeg;
+	image.src = centre + '-' + date + '.jpg';
 
-	canvas.addEventListener(
-		'click',
+	$('#canvas').click(
 		function(event) {
 			var rect = canvas.getBoundingClientRect();
 			var canvas_x = event.clientX - rect.left;
@@ -140,25 +138,22 @@ window.onload = function() {
 			window.history.replaceState(undefined, undefined, anchor(boxes));
 		});
 
-	document.getElementById('download').addEventListener(
-		'click',
+	$('#download').click(
 		function(event) {
 			window.location.href = canvas.toDataURL('image/jpeg', 0.2);
 		});
 
-	document.getElementById('clear').addEventListener(
-		'click',
+	$('#clear').click(
 		function(event) {
 			boxes.reset();
 			draw(canvas, context, image, boxes);
 			window.history.replaceState(undefined, undefined, anchor(boxes));
 		});
 
-	document.getElementById('random').addEventListener(
-		'click',
+	$('#random').click(
 		function(event) {
 			boxes.random();
 			draw(canvas, context, image, boxes);
 			window.history.replaceState(undefined, undefined, anchor(boxes));
 		});
-}
+})
