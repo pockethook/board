@@ -56,7 +56,7 @@ function Boxes(boxes) {
 	this.visible = new Set();
 	this.toString = function() {
 		var asc = function(a, b){ return a - b; };
-		return '[' + Array.from(this.visible).sort(asc) + ']';
+		return Array.from(this.visible).sort(asc).toString();
 	};
 	this.boxes_at_point = function(x, y) {
 		var ret = []
@@ -103,7 +103,8 @@ $(document).ready(function() {
 	$.getJSON(centre + '-' + date + '.json', function(data) {
 		boxes = new Boxes(data);
 		try {
-			var indices = JSON.parse(window.location.hash.substring(1));
+			var indices = JSON.parse(
+				'[' + window.location.hash.substring(1) + ']');
 			// ignores bad values
 			boxes.add(indices);
 			draw(canvas, context, image, boxes);
