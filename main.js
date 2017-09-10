@@ -23,78 +23,18 @@ function anchor(boxes) {
 	}
 }
 
-function point_in_box(x, y, box) {
-	if (x > box.x + box.width || x < box.x ||
-		y > box.y + box.height || y < box.y) {
-		return false;
-	} else { 
-		return true;
-	}
+function set_url_from_boxes(boxes) {
+	window.history.replaceState(undefined, undefined, anchor(boxes));
 }
 
-function closest_box(x, y, boxes, indices) {
-	if (indices.length) {
-		var min_distance_2 = Number.MAX_VALUE;
-		var min_index = -1;
-		for (var i of indices) {
-			var diff_x = boxes[i].x + boxes[i].width / 2 - x;
-			var diff_y = boxes[i].y + boxes[i].height / 2 - y;
-			var distance_2 = diff_x * diff_x + diff_y * diff_y;
-			if (distance_2 < min_distance_2) {
-				min_distance_2 = distance_2;
-				min_index = i;
-			}
-		}
-		return min_index;
-	} else {
-		return null;
-	}
-}
-
-function Boxes(boxes) {
-	this.boxes = boxes;
-	this.visible = new Set();
-	this.toString = function() {
-		var asc = function(a, b){ return a - b; };
-		return Array.from(this.visible).sort(asc).toString();
-	};
-	this.boxes_at_point = function(x, y) {
-		var ret = []
-		for (var i = 0; i < this.boxes.length; i++) {
-			if (point_in_box(x, y, boxes[i])) {
-				ret.push(i);
-			}
-		}
-		return ret;
-	}
-	this.box_at_point = function(x, y) {
-		var indices = this.boxes_at_point(x, y);
-		return closest_box(x, y, this.boxes, indices);
-	}
-	this.toggle = function(index) {
-		if (this.visible.has(index)) {
-			this.visible.delete(index);
-		} else {
-			if (index >= 0 && index < this.boxes.length) {
-				this.visible.add(index);
-			}
-		}
-	}
-	this.add = function(indices) {
-		for (var index of indices) {
-			this.visible.add(index);
-		}
-	}
-	this.reset = function() {
-		this.visible.clear();
-	}
-	this.random = function() {
-		this.reset();
-		for (var i = 0; i < this.boxes.length; i++) {
-			if (Math.random() < 0.1) {
-				this.visible.add(i);
-			}
-		}
+function set_boxes_from_url(boxes) {
+	try {
+		var indices = JSON.parse(
+			'[' + window.location.hash.substring(1) + ']');
+		boxes.reset()
+		// ignores bad values
+		boxes.add(indices);
+	} catch (e) {
 	}
 }
 
@@ -102,19 +42,17 @@ $(document).ready(function() {
 	var boxes;
 	$.getJSON(centre + '-' + date + '.json', function(data) {
 		boxes = new Boxes(data);
-		try {
-			var indices = JSON.parse(
-				'[' + window.location.hash.substring(1) + ']');
-			// ignores bad values
-			boxes.add(indices);
-			draw(canvas, context, image, boxes);
-		} catch (e) {
-		}
-		window.history.replaceState(undefined, undefined, anchor(boxes));
+		set_boxes_from_url(boxes);
+		draw(canvas, context, image, boxes);
+		set_url_from_boxes(boxes);
 	});
 
 	var canvas = $('#canvas')[0];
 	var context = canvas.getContext('2d');
+
+	var download = $('#download');
+	var clear = $('#clear');
+	var random = $('#random');
 
 	var image = new Image();
 	image.onload = function() {
@@ -136,25 +74,34 @@ $(document).ready(function() {
 				boxes.toggle(index);
 			}
 			draw(canvas, context, image, boxes);
-			window.history.replaceState(undefined, undefined, anchor(boxes));
+			set_url_from_boxes(boxes);
 		});
 
-	$('#download').click(
+	download.click(
 		function(event) {
-			window.location.href = canvas.toDataURL('image/jpeg', 0.2);
+			var data = canvas.toDataURL('image/jpeg', 0.2);
+			download.attr('href', data)
+			download.attr('download', new Date().getTime() + '.jpg')
 		});
 
-	$('#clear').click(
+	clear.click(
 		function(event) {
 			boxes.reset();
 			draw(canvas, context, image, boxes);
-			window.history.replaceState(undefined, undefined, anchor(boxes));
+			set_url_from_boxes(boxes);
 		});
 
-	$('#random').click(
+	random.click(
 		function(event) {
 			boxes.random();
 			draw(canvas, context, image, boxes);
-			window.history.replaceState(undefined, undefined, anchor(boxes));
+			set_url_from_boxes(boxes);
 		});
-})
+
+	$(window).on(
+		'popstate',
+		function() {
+			set_boxes_from_url(boxes);
+			draw(canvas, context, image, boxes);
+		});
+});

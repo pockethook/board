@@ -3,6 +3,7 @@
 	<head>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script type="text/javascript" src="arch-north-2017-04-04.js"></script>
+		<script type="text/javascript" src="boxes.js"></script>
 		<script type="text/javascript" src="main.js"></script>
 		<link href="style.css" rel="stylesheet">
 	</head>
@@ -11,9 +12,11 @@
 			<canvas id="canvas"></canvas>
 		</div>
 		<div class="panel">
-			<button type="button" class="controls" id="download">Download</button>
-			<button type="button" class="controls" id="random">Random</button>
-			<button type="button" class="controls" id="clear">Clear</button>
+			<ul>
+				<li><a class="controls" id="download" href='javascript:;'>download</a></li>
+				<li><a class="controls" id="random" href='javascript:;'>random</a></li>
+				<li><a class="controls" id="clear" href='javascript:;'>clear</a></li>
+			</ul>
 		</div>
 	</body>
 </html>
