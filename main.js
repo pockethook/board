@@ -1,4 +1,5 @@
-function draw(canvas, context, image, boxes) {
+function draw(canvas, image, boxes) {
+	var context = canvas.getContext('2d');
 	if (image !== undefined) {
 		context.drawImage(
 			image, 0, 0, image.width, image.height,
@@ -40,68 +41,65 @@ function set_boxes_from_url(boxes) {
 
 $(document).ready(function() {
 	var boxes;
-	$.getJSON(centre + '-' + date + '.json', function(data) {
-		boxes = new Boxes(data);
-		set_boxes_from_url(boxes);
-		draw(canvas, context, image, boxes);
-		set_url_from_boxes(boxes);
-	});
-
 	var canvas = $('#canvas')[0];
-	var context = canvas.getContext('2d');
-
-	var download = $('#download');
-	var clear = $('#clear');
-	var random = $('#random');
-
 	var image = new Image();
+
+	var events = function() {
+		$('#canvas').click(
+			function(event) {
+				var rect = canvas.getBoundingClientRect();
+				var canvas_x = event.clientX - rect.left;
+				var canvas_y = event.clientY - rect.top;
+				var x = canvas_x * image.width / rect.width;
+				var y = canvas_y * image.height / rect.height;
+				var index = boxes.box_at_point(x, y);
+				if (index !== null) {
+					boxes.toggle(index);
+				}
+				draw(canvas, image, boxes);
+				set_url_from_boxes(boxes);
+			});
+
+		$('#download').click(
+			function(event) {
+				var data = canvas.toDataURL('image/jpeg', 0.2);
+				$(this).attr('href', data)
+				$(this).attr('download', new Date().getTime() + '.jpg')
+			});
+
+		$('#clear').click(
+			function(event) {
+				boxes.reset();
+				draw(canvas, image, boxes);
+				set_url_from_boxes(boxes);
+			});
+
+		$('#random').click(
+			function(event) {
+				boxes.random();
+				draw(canvas, image, boxes);
+				set_url_from_boxes(boxes);
+			});
+
+		$(window).on(
+			'popstate',
+			function() {
+				set_boxes_from_url(boxes);
+				draw(canvas, image, boxes);
+			});
+	};
+
 	image.onload = function() {
 		canvas.width = image.width;
 		canvas.height = image.height;
-		draw(canvas, context, image, boxes);
+		$.getJSON(centre + '-' + date + '.json', function(data) {
+			boxes = new Boxes(data);
+			set_boxes_from_url(boxes);
+			draw(canvas, image, boxes);
+			set_url_from_boxes(boxes);
+			events();
+		});
 	};
 	image.src = centre + '-' + date + '.jpg';
 
-	$('#canvas').click(
-		function(event) {
-			var rect = canvas.getBoundingClientRect();
-			var canvas_x = event.clientX - rect.left;
-			var canvas_y = event.clientY - rect.top;
-			var x = canvas_x * image.width / rect.width;
-			var y = canvas_y * image.height / rect.height;
-			var index = boxes.box_at_point(x, y);
-			if (index !== null) {
-				boxes.toggle(index);
-			}
-			draw(canvas, context, image, boxes);
-			set_url_from_boxes(boxes);
-		});
-
-	download.click(
-		function(event) {
-			var data = canvas.toDataURL('image/jpeg', 0.2);
-			download.attr('href', data)
-			download.attr('download', new Date().getTime() + '.jpg')
-		});
-
-	clear.click(
-		function(event) {
-			boxes.reset();
-			draw(canvas, context, image, boxes);
-			set_url_from_boxes(boxes);
-		});
-
-	random.click(
-		function(event) {
-			boxes.random();
-			draw(canvas, context, image, boxes);
-			set_url_from_boxes(boxes);
-		});
-
-	$(window).on(
-		'popstate',
-		function() {
-			set_boxes_from_url(boxes);
-			draw(canvas, context, image, boxes);
-		});
 });
