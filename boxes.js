@@ -44,11 +44,11 @@ function Boxes(boxes) {
 			}
 		}
 		return ret;
-	}
+	};
 	this.box_at_point = function(x, y) {
 		var indices = this.boxes_at_point(x, y);
 		return closest_box(x, y, this.boxes, indices);
-	}
+	};
 	this.toggle = function(index) {
 		if (this.visible.has(index)) {
 			this.visible.delete(index);
@@ -57,15 +57,15 @@ function Boxes(boxes) {
 				this.visible.add(index);
 			}
 		}
-	}
+	};
 	this.add = function(indices) {
 		for (var index of indices) {
 			this.visible.add(index);
 		}
-	}
+	};
 	this.reset = function() {
 		this.visible.clear();
-	}
+	};
 	this.random = function() {
 		this.reset();
 		for (var i = 0; i < this.boxes.length; i++) {
@@ -73,5 +73,5 @@ function Boxes(boxes) {
 				this.visible.add(i);
 			}
 		}
-	}
+	};
 }
