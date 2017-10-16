@@ -1,77 +1,45 @@
-function point_in_box(x, y, box) {
-	if (x > box.x + box.width || x < box.x ||
-		y > box.y + box.height || y < box.y) {
-		return false;
-	} else { 
-		return true;
-	}
-}
+"use strict"
 
-function closest_box(x, y, boxes, indices) {
-	if (indices.length) {
-		var min_distance_2 = Number.MAX_VALUE;
-		var min_index = -1;
-		for (var i of indices) {
-			var mid_x = boxes[i].x + boxes[i].width / 2;
-			var mid_y = boxes[i].y + boxes[i].height / 2;
-			var diff_x = mid_x - x;
-			var diff_y = mid_y - y;
-			var distance_2 = diff_x * diff_x + diff_y * diff_y;
-			if (distance_2 <= min_distance_2) {
-				min_distance_2 = distance_2;
-				min_index = i;
-			}
-		}
-		return min_index;
-	} else {
-		return null;
-	}
-}
+function Boxes(annotations) {
+	const reset = () => annotations.forEach(value => value.visible = false);
 
+	const point_in_box = (x, y, box) =>
+		x <= box.x + box.width && x >= box.x &&
+		y <= box.y + box.width && y >= box.y;
 
-function Boxes(boxes) {
-	this.boxes = boxes;
-	this.visible = new Set();
-	this.toString = function() {
-		var ascending = function(a, b){ return a - b; };
-		return Array.from(this.visible).sort(ascending).toString();
-	};
-	this.boxes_at_point = function(x, y) {
-		var ret = []
-		for (var i = 0; i < this.boxes.length; i++) {
-			if (point_in_box(x, y, boxes[i])) {
-				ret.push(i);
-			}
-		}
-		return ret;
-	};
-	this.box_at_point = function(x, y) {
-		var indices = this.boxes_at_point(x, y);
-		return closest_box(x, y, this.boxes, indices);
-	};
-	this.toggle = function(index) {
-		if (this.visible.has(index)) {
-			this.visible.delete(index);
-		} else {
-			if (index >= 0 && index < this.boxes.length) {
-				this.visible.add(index);
-			}
-		}
-	};
-	this.add = function(indices) {
-		for (var index of indices) {
-			this.visible.add(index);
-		}
-	};
-	this.reset = function() {
-		this.visible.clear();
-	};
-	this.random = function() {
-		this.reset();
-		for (var i = 0; i < this.boxes.length; i++) {
-			if (Math.random() < 0.1) {
-				this.visible.add(i);
-			}
-		}
+	const box_distance = (x, y, box) =>
+		Math.sqrt(
+			Math.pow(box.x + box.width / 2 - x, 2),
+			Math.pow(box.y + box.height / 2 - y, 2));
+
+	const closest_box = (x, y, boxes) =>
+		boxes.sort((lhs, rhs) =>
+			box_distance(x, y, lhs) - box_distance(x, y, rhs))[0];
+
+	const boxes_at_point = (x, y, boxes) =>
+		boxes.filter(box => point_in_box(x, y, box));
+
+	const box_at_point = (x, y, boxes) =>
+		closest_box(x, y, boxes_at_point(x, y, boxes));
+
+	const toggle_visible = (box) => box.visible = !box.visible;
+
+	reset();
+
+	return {
+		boxes: () => annotations.filter(value => value.visible),
+		toString: () => 
+			annotations.map(
+				(value, index) => value.visible ? index : undefined).filter(
+					value => value !== undefined).toString(),
+		toggle_box_at_point: (x, y) => {
+			const box = box_at_point(x, y, annotations);
+			if (box) {toggle_visible(box);}
+		},
+		add: indices =>
+			indices.forEach(index => annotations[index].visible = true),
+		random: () =>
+			annotations.forEach(value => value.visible = Math.random() < 0.1),
+		reset,
 	};
 }
