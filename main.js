@@ -1,4 +1,6 @@
-"use strict"
+'use strict';
+
+import Boxes from './boxes.js';
 
 function draw(image, boxes) {
 	const canvas = $('#canvas')[0];
@@ -24,15 +26,15 @@ function set_url_from_boxes(boxes) {
 function on_boxes_change(image, boxes) {
 	draw(image, boxes);
 	set_url_from_boxes(boxes);
-
 }
 
 function set_boxes_from_url(boxes) {
 	try {
 		const indices = JSON.parse(`[${window.location.hash.substring(1)}]`);
-		boxes.reset()
+		boxes.reset();
 		boxes.add(indices);
 	} catch (e) {
+		// ignore
 	}
 }
 
@@ -48,18 +50,19 @@ function events(image, boxes) {
 	});
 
 	$('#download').click(event => {
+		const canvas = $('#canvas')[0];
 		const data = canvas.toDataURL('image/jpeg', 0.2);
 		$(event.target).attr('href', data);
 		$(event.target).attr(
 			'download', `${centre}-${date}-${Date.now()}.jpg`);
 	});
 
-	$('#clear').click(event => {
+	$('#clear').click(()=> {
 		boxes.reset();
 		on_boxes_change(image, boxes);
 	});
 
-	$('#random').click(event => {
+	$('#random').click(()=> {
 		boxes.random();
 		on_boxes_change(image, boxes);
 	});
@@ -76,7 +79,7 @@ $(document).ready(function() {
 		const canvas = $('#canvas')[0];
 		canvas.width = image.width;
 		canvas.height = image.height;
-		$.getJSON(`${centre}-${date}.json`, function(data) {
+		$.getJSON(`${centre}-${date}.json`, data => {
 			const boxes = Boxes(data);
 			set_boxes_from_url(boxes);
 			on_boxes_change(image, boxes);
@@ -84,5 +87,4 @@ $(document).ready(function() {
 		});
 	};
 	image.src = `${centre}-${date}.jpg`;
-
 });

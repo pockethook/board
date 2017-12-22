@@ -1,6 +1,6 @@
-"use strict"
+'use strict';
 
-function Boxes(annotations) {
+export default function(annotations) {
 	const reset = () => annotations.forEach(value => value.visible = false);
 
 	const point_in_box = (x, y, box) =>
@@ -24,14 +24,17 @@ function Boxes(annotations) {
 
 	const toggle_visible = (box) => box.visible = !box.visible;
 
+	const visible = () =>
+		annotations
+			.map((value, index) => value.visible ? index : undefined)
+			.filter(value => value !== undefined);
+
 	reset();
 
 	return {
 		boxes: () => annotations.filter(value => value.visible),
-		toString: () => 
-			annotations.map(
-				(value, index) => value.visible ? index : undefined).filter(
-					value => value !== undefined).toString(),
+		visible,
+		toString: () => visible().toString(),
 		toggle_box_at_point: (x, y) => {
 			const box = box_at_point(x, y, annotations);
 			if (box) {toggle_visible(box);}
