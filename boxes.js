@@ -5,7 +5,7 @@ export default function(annotations) {
 
 	const point_in_box = (x, y, box) =>
 		x <= box.x + box.width && x >= box.x &&
-		y <= box.y + box.width && y >= box.y;
+		y <= box.y + box.height && y >= box.y;
 
 	const box_distance = (x, y, box) =>
 		Math.sqrt(
