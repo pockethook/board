@@ -3,7 +3,7 @@
 import Boxes from './boxes.js';
 
 function draw(image, boxes) {
-	const canvas = $('#canvas')[0];
+	const canvas = $('.canvas')[0];
 	const context = canvas.getContext('2d');
 	context.drawImage(
 		image, 0, 0, image.width, image.height,
@@ -39,7 +39,7 @@ function set_boxes_from_url(boxes) {
 }
 
 function events(image, boxes) {
-	$('#canvas').click(event => {
+	$('.canvas').click(event => {
 		const rect = event.target.getBoundingClientRect();
 		const canvas_x = event.clientX - rect.left;
 		const canvas_y = event.clientY - rect.top;
@@ -76,7 +76,7 @@ function events(image, boxes) {
 $(document).ready(function() {
 	const image = new Image();
 	image.onload = function() {
-		const canvas = $('#canvas')[0];
+		const canvas = $('.canvas')[0];
 		canvas.width = image.width;
 		canvas.height = image.height;
 		$.getJSON(`${centre}-${date}.json`, data => {

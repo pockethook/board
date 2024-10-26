@@ -1,24 +1,58 @@
-#centres {
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+h1 {
+    margin: 0.67em;
+}
+
+.boards {
+    margin: 1em 4em;
 	list-style-type: none;
 }
 
-#canvas {
-	width: 96vw;
+.boards li a {
+	font-size: 1.2em;
+}
+
+.image {
+	display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+}
+
+.canvas {
+	width: 98vw;
+	margin: 1vw;
+}
+
+.panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
 }
 
 .panel ul {
-	width: 96vw;
-	list-style-type: none;
-	padding: 0;
+    width: 98vw;
+    list-style-type: none;
+    display: flex;
+	gap: 1vw;
+}
+
+.panel ul li {
+    flex: 1;
 }
 
 .panel ul li a {
-	float: left;
-	width: 30vw;
-	line-height: 6vh;
-	color: white;
-	text-align: center;
-	text-decoration: none;
-	background-color: #333;
-	border: 1vw solid white;
+    display: block;
+    width: 100%;
+    line-height: 6vh;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    background-color: #333;
 }
